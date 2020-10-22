@@ -1,0 +1,10 @@
+根据功能分类
+命名空间 统一Framework
+1.editor
+    ...
+2.runtime
+    [1]Pack File(文件打包，读取，加载) 
+		打包ab到目标文件夹，并生成对应config文件，读取加载时根据config文件来读取加载。
+		
+	[2]Utils (工具包)  
+		FFactory.cs （读取，写入目标文件夹内容）1.将你想写入的内容写入新文件
