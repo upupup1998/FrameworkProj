@@ -13,14 +13,16 @@ namespace Framework {
             init = true;
             Instance.InitPack();
         }
-        private void InitPack() {
+        private void InitPack()
+        {
 #if UNITY_EDITOR
             if (PackSettings.SimulateAssetBundle)
             {
-                //将ab包内的文件加入到索引中
+               
             }
 #endif
-            else {
+            else
+            {
 
             }
         }

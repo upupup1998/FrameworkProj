@@ -63,24 +63,23 @@ public class SignAssets
    // [MenuItem("Ackerman/Tools/打包")]
     public static void PackageAbs()
     {
-        string directory = Application.streamingAssetsPath + "/TestPackage";
-
+        string directory = PackSettings.ABPath;
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
-            Debug.Log("目录=" + directory);
         }
         AssetBundleManifest assetBundleManifest = BuildPipeline.BuildAssetBundles(directory, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
         if (assetBundleManifest != null)
         {
-            Debug.Log("ab打包完成!");
+            Debug.Log("AB打包完成!打包目录：" + directory);
         }
-        // DirectoryInfo代表文件夹的一个类 可实例化 ,Dircetory 静态类 不可实例化
+        // DirectoryInfo代表文件夹的一个类 可实例化 ,Directory 静态类 不可实例化
         DirectoryInfo directoryInfo = new DirectoryInfo(directory);
         FileInfo[] files = directoryInfo.GetFiles();
         foreach (FileInfo file in files)
         {
-            if (file.Name.EndsWith("manifest") || file.Name.StartsWith("TestPackage"))
+            //清除manifest文件，打包目录
+            if (file.Name.EndsWith("manifest")||directory.Contains(file.Name) )
             {
                 File.Delete(file.FullName);
             }

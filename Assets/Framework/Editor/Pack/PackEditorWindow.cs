@@ -38,9 +38,13 @@ namespace Framework {
            
             PackSettings.SimulateAssetBundle= GUILayout.Toggle(PackSettings.SimulateAssetBundle, LocaleText.SimulationMode);
             PackSettings.ABPath = EditorGUILayout.TextField("Package Path", PackSettings.ABPath);
-           
-            GUILayout.Button("Package");
-            GUILayout.Button("Clear All Package");
+
+            if (GUILayout.Button("Package")) {
+                SignAssets.PackageAbs();
+            }
+            if (GUILayout.Button("Clear All Package")) {
+                SignAssets.ClearAbs();
+            } 
             GUIStyle style = new GUIStyle();
             style.fontStyle = FontStyle.Bold;
             style.fontSize = 15;

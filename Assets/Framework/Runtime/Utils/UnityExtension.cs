@@ -13,4 +13,12 @@ public static class UnityExtension
             Debug.Log(str);
         }
     }
+    /// <summary>
+    /// 实例化object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="parent"></param>
+    public static void Create(this Object obj,Transform parent=null) {
+        Object.Instantiate(obj,parent);
+    }
 }
