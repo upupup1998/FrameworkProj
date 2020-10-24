@@ -28,23 +28,40 @@ public class TestRun : MonoBehaviour
         //    AssetDatabase.LoadAssetAtPath<Object>(s).Create();
         //}
         print("解包");
-        allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
-       
-        
+        allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();//获取所有的ab包的名字 ui cube sphere
+
+
         audioSource.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Prefabs/Sound/AudioTrainingSub1_1.mp3");
         audioSource.Play();
+        if (!string.IsNullOrEmpty(FindAB("cube"))) {
+            AssetDatabase.LoadAssetAtPath<Object>(FindAB("cube")).Create();
+        }
 #endif
     }
-    void FindAB(string assetName) {
-        foreach (string s in allAssetBundleNames)
+    /// <summary>
+    ///通过遍历ab包，给定资源名来获取资源路径
+    /// </summary>
+    /// <param name="assetName"></param>
+    string FindAB(string assetName) {
+        if (allAssetBundleNames.Length != 0)
         {
-            string[] s1 = AssetDatabase.GetAssetPathsFromAssetBundle(s);
-            
-            foreach (string s2 in s1)
+            foreach (string s in allAssetBundleNames)
             {
-                print(s2);
+                string[] s1 = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
+                if (s1.Length != 0)
+                {
+                    return s1[0];
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
         }
+        else {
+            return string.Empty;
+        }
+        return string.Empty;
     }
     void TestFF() {
         //string str = "hjellldjsakldjklsajdlkajsdkjaskldjklasjdkljaskljdl1";
@@ -63,3 +80,13 @@ public class TestRun : MonoBehaviour
         
     }
 }
+/*
+ AssetDatabase类：对资源进行读取的类
+ 不能被实例化，可用来读取asset，只能在editor下使用
+     方法：
+     GetAllAssetBundleNames() 获取所有的ab包的名字
+     GetAssetPathsFromAssetBundle(string abName) 获取ab包中的所有资源路径
+     GetAssetPathsFromAssetBundleAndAssetName(string abName,string assetName)给定ab包名，资源名字，获取到资源的路径
+     LoadAssetAtPath<T>(string assetPath)指定要加载的资源类型T,给定资源的路径，加载资源
+     GetAssetBundleDependencies()获取资源引用（暂无使用）
+     */
