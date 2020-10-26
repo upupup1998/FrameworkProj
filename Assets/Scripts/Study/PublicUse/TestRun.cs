@@ -16,7 +16,12 @@ public class TestRun : MonoBehaviour
         //Enemy enemy=  new Enemy(observer);
         //Hero hero =  new Hero(observer);
         //observer.NoticeAll();
-        TestAssets();
+        TestPackKit();
+    }
+    void TestPackKit()
+    {
+        PackKit.Instance.Init(this);
+        PackKit.Instance.LoadPrefabSync("Cube").Create();
     }
     void TestAssets() {
 #if UNITY_EDITOR
@@ -36,6 +41,7 @@ public class TestRun : MonoBehaviour
         if (!string.IsNullOrEmpty(FindAB("cube"))) {
             AssetDatabase.LoadAssetAtPath<Object>(FindAB("cube")).Create();
         }
+       
 #endif
     }
     /// <summary>

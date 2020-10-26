@@ -3,36 +3,43 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Framework { 
+namespace Framework {
     public class PackKit : MonoSingleton<PackKit>
     {
-        
+       
         private static bool init = false;
         string[] allAssetBundleNames;
+        private bool isInitDict = false;
         private Dictionary<string, UnityEngine.Object> prefabDict;
+        private MonoBehaviour _mono=null;
         /// <summary>
         /// 初始化PackKit
         /// </summary>
-        public static void Init() {
+        public void Init(MonoBehaviour mono) {
             if (init) return;
             init = true;
-            Instance.InitPack();
+            _mono = mono;
+            InitPack();
         }
         private void InitPack()
         {
 #if UNITY_EDITOR
-            //勾选了模拟模式，直接在editor模式下加载资源
+
+            //勾选了Simulate模式，直接在editor模式下加载资源
             if (PackSettings.SimulateAssetBundle)
             {
+             
                 allAssetBundleNames = UnityEditor.AssetDatabase.GetAllAssetBundleNames();
+                Debug.Log(allAssetBundleNames.Length);
                 prefabDict = new Dictionary<string, UnityEngine.Object>();
-                Instance.AddPrefabDict();
+                InitPrefabDict();
+                Debug.Log("Init PackKit Success");
             }
 #endif
             //在ab包中加载资源
             else
             {
-
+                _mono.StartCoroutine("Load");
             }
         }
         /// <summary>
@@ -42,21 +49,52 @@ namespace Framework {
         /// <param name="assetName"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static T LoadAssetSync<T>(string assetName, Action action = null) where T : UnityEngine.Object
+        public  T LoadAssetSync<T>(string assetName, Action action = null) where T : UnityEngine.Object
         {
-            if (Instance.FindAsset<T>(assetName)!=null) return default(T);
-            return Instance.FindAsset<T>(assetName, action);
+            if (FindAsset<T>(assetName)!=null) return default(T);
+            return FindAsset<T>(assetName, action);
         }
 
         /// <summary>
-        /// 同步加载资源Prefabs
+        /// 预加载资源Prefabs
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static System.Object LoadPrefabSync(string assetName,Action action=null) {
-            if (string.IsNullOrEmpty(Instance.FindAB(assetName))) return null;
-            return  Instance.CreateAB(assetName, action);
+        public void AddPrefabLoader(List<string> list) {
+            //#if UNITY_EDITOR
+            //            //编辑器环境下加载
+            //            string abPath = FindAB(assetName);
+            //            if (string.IsNullOrEmpty(abPath)) return null;
+            //            return GetPrefabForPath(abPath);
+            //#else
+            //            //非编辑器环境下加载
+
+            //#endif
+
+            //_mono.StartCoroutine(Load(Application.streamingAssetsPath+ "/cube_prefab", "Cube",()=> {
+            //    return prefabCallBack;
+            //}));
+            if (list.Count == 0) return;
+            foreach (string s in list) {
+                //_mono.StartCoroutine(Load());
+            }
+           
         }
+        private UnityEngine.Object prefabCallBack;
+        IEnumerator Load(string abPath,string fileName,Action action) {
+            
+            var prefab = AssetBundle.LoadFromFile(abPath);
+            if (prefab==null) {
+                Debug.Log("Load AB Failed.");
+                yield break;//直接结束后续的操作
+            }
+           
+            UnityEngine.Object obj = prefab.LoadAsset(fileName);
+            prefabCallBack = obj;
+            prefab.Unload(false);
+            action();
+        }
+
         /// <summary>
         ///通过遍历ab包，给定资源名来获取资源路径
         /// </summary>
@@ -66,16 +104,15 @@ namespace Framework {
         {
             if (allAssetBundleNames.Length != 0)
             {
+                
                 foreach (string s in allAssetBundleNames)
                 {
                     string[] s1 = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
+                    
                     if (s1.Length != 0)
                     {
+                        
                         return s1[0];
-                    }
-                    else
-                    {
-                        return string.Empty;
                     }
                 }
             }
@@ -91,7 +128,7 @@ namespace Framework {
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        System.Object CreateAB(string assetName,Action action=null)
+        UnityEngine.Object CreateAB(string assetName,Action action=null)
         {
             if (allAssetBundleNames.Length != 0)
             {
@@ -154,26 +191,32 @@ namespace Framework {
         /// <summary>
         /// 添加prefab到引用中
         /// </summary>
-        private void AddPrefabDict() {
+        private void InitPrefabDict() {
+           
             if (allAssetBundleNames.Length != 0)
             {
-                foreach (string s in allAssetBundleNames)
+                foreach (string abName in allAssetBundleNames)
                 {
-                    //string[] s1 = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
-                    //if (s1.Length != 0)
-                    //{
-                        
-
                     
-                    //}
-                    //else
-                    //{
-                       
-                    //}
+                    string[] assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundle(abName);
+                    foreach (string assetPath in assetPaths) {
+                        if (assetPath.EndsWith("prefab")) {
+                            prefabDict.Add(assetPath,UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath));
+                        }
+                    }
+                 
                 }
             }
+            isInitDict = true;
         }
-
+        /// <summary>
+        /// 遍历prefabsdic，获取对应的Object
+        /// </summary>
+        private UnityEngine.Object GetPrefabForPath(string prefabPath) {
+            if (string.IsNullOrEmpty(prefabPath)||!prefabDict.ContainsKey(prefabPath)) return null;
+           
+            return prefabDict[prefabPath];
+        }
 #endif
 
 
@@ -189,9 +232,9 @@ namespace Framework {
      LoadAssetAtPath<T>(string assetPath)指定要加载的资源类型T,给定资源的路径，加载资源
      GetAssetBundleDependencies()获取资源引用（暂无使用）
 
-模拟模式加载策略：
-1.加载Prefabs类型的资源
-游戏开始时预先加载好，存放在字典中，需要使用的时候再从字典中取出使用。
-2.加载非Prefabs类型的资源 如：音乐，图片，shader，脚本
-直接使用PackKit.LoadAssetSync方法进行加载
+Simulate mode 加载策略：
+    1.加载Prefabs类型的资源
+    游戏开始时预先加载好，存放在字典中，需要使用的时候再从字典中取出使用。Compeleted
+    2.加载非Prefabs类型的资源 如：音乐，图片，shader，脚本
+    直接使用PackKit.LoadAssetSync方法进行加载
      */

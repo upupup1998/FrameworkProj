@@ -21,4 +21,11 @@ public static class UnityExtension
     public static void Create(this Object obj,Transform parent=null) {
         Object.Instantiate(obj,parent);
     }
+    /// <summary>
+    /// 字符串打印
+    /// </summary>
+    /// <param name="str"></param>
+    public static void Log(this string str ) {
+        Debug.Log(str);
+    }
 }
