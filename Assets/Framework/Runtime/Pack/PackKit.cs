@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEditor;
 namespace Framework {
-    public class PackKit : MonoSingleton<PackKit>
+    public class PackKit : Singleton<PackKit>
     {
        
         private static bool init = false;
@@ -21,38 +21,25 @@ namespace Framework {
             _mono = mono;
             InitPack();
         }
-        private void InitPack()
-        {
+        private void InitPack(){
 #if UNITY_EDITOR
-
             //勾选了Simulate模式，直接在editor模式下加载资源
             if (PackSettings.SimulateAssetBundle)
             {
              
                 allAssetBundleNames = UnityEditor.AssetDatabase.GetAllAssetBundleNames();
-                Debug.Log(allAssetBundleNames.Length);
+                //Debug.Log(allAssetBundleNames.Length);
                 prefabDict = new Dictionary<string, UnityEngine.Object>();
                 InitPrefabDict();
                 Debug.Log("Init PackKit Success");
+                
             }
-#endif
-            //在ab包中加载资源
             else
+#endif
             {
-                _mono.StartCoroutine("Load");
+                ////在ab包中预加载资源
+                //_mono.StartCoroutine("Load");
             }
-        }
-        /// <summary>
-        /// 同步加载资源，图片，音乐
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="assetName"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public  T LoadAssetSync<T>(string assetName, Action action = null) where T : UnityEngine.Object
-        {
-            if (FindAsset<T>(assetName)!=null) return default(T);
-            return FindAsset<T>(assetName, action);
         }
 
         /// <summary>
@@ -76,6 +63,7 @@ namespace Framework {
             //}));
             if (list.Count == 0) return;
             foreach (string s in list) {
+                
                 //_mono.StartCoroutine(Load());
             }
            
@@ -94,12 +82,26 @@ namespace Framework {
             prefab.Unload(false);
             action();
         }
+#if UNITY_EDITOR
+        /// <summary>
+        /// 同步加载资源，图片，音乐
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="assetName"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public T LoadAssetSync<T>(string assetName, Action action = null) where T : UnityEngine.Object
+        {
+            var obj = FindAsset<T>(assetName, action);
+            if (obj == null) return default(T);
+            return obj;
+        }
 
         /// <summary>
         ///通过遍历ab包，给定资源名来获取资源路径
         /// </summary>
         /// <param name="assetName"></param>
-#if UNITY_EDITOR
+
         string FindAB(string assetName)
         {
             if (allAssetBundleNames.Length != 0)
@@ -162,24 +164,25 @@ namespace Framework {
         /// <returns></returns>
         T FindAsset<T>(string assetName, Action action = null) where T : UnityEngine.Object
         {
+            
             if (allAssetBundleNames.Length != 0)
             {
+                
                 foreach (string s in allAssetBundleNames)
                 {
                     string[] s1 = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
+                    
                     if (s1.Length != 0)
                     {
+                        Debug.Log(s1[0]);
                         if (action != null)
                         {
                             action();
                         }
-
+                       
                         return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(s1[0]);
                     }
-                    else
-                    {
-                        return default(T);
-                    }
+                   
                 }
             }
             else
@@ -232,9 +235,12 @@ namespace Framework {
      LoadAssetAtPath<T>(string assetPath)指定要加载的资源类型T,给定资源的路径，加载资源
      GetAssetBundleDependencies()获取资源引用（暂无使用）
 
+直接从ab中加载资源：
+
+
 Simulate mode 加载策略：
     1.加载Prefabs类型的资源
     游戏开始时预先加载好，存放在字典中，需要使用的时候再从字典中取出使用。Compeleted
     2.加载非Prefabs类型的资源 如：音乐，图片，shader，脚本
-    直接使用PackKit.LoadAssetSync方法进行加载
+    直接使用PackKit.LoadAssetSync方法进行加载。Compeleted                            
      */

@@ -3,10 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UI;
+using System.IO;
+
+
+using Newtonsoft.Json;
+using System.Text;
+
+public struct Asset {
+    public Dictionary<string, string> dict;
+}
 public class TestRun : MonoBehaviour
 {
     public AudioSource audioSource;
     string[] allAssetBundleNames;
+    public Sprite sprite;
+    public Image img;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,57 +28,82 @@ public class TestRun : MonoBehaviour
         //Enemy enemy=  new Enemy(observer);
         //Hero hero =  new Hero(observer);
         //observer.NoticeAll();
-        TestPackKit();
+        //TestPackKit();
+        // TestLoadAB();
+        TestLoadAB();
+        TestJson();
     }
     void TestPackKit()
     {
-        PackKit.Instance.Init(this);
-        PackKit.Instance.LoadPrefabSync("Cube").Create();
+        //PackKit.Instance.Init(this);
+        //audioSource.clip = PackKit.Instance.LoadAssetSync<AudioClip>("AudioTrainingSub1_1");
+        //audioSource.Play();
+        //img.sprite = PackKit.Instance.LoadAssetSync<Sprite>("fire");
+        //PackKit.Instance.LoadPrefabSync("Cube").Create();
+    }
+    void TestLoadAB() {
+        //string abPaths = Application.streamingAssetsPath;
+        //string[] fileNames = Directory.GetFiles(abPaths);
+        //foreach (string s in fileNames)
+        //{
+        //    print(s);
+        //}
+        //AssetBundle asset = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/sound");
+        //foreach (Object obj in asset.LoadAllAssets())
+        //{
+        //    print(obj.name);
+        //}
+    }
+    /// <summary>
+    /// 将ab中的资源文件的名字作为值，路径作为键。打包时写入到配置表中json格式。
+    /// </summary>
+    void TestJson() {
+      
     }
     void TestAssets() {
-#if UNITY_EDITOR
-        //string []str= AssetDatabase.GetAssetPathsFromAssetBundle("cube");
-        //string []str= AssetDatabase.GetAllAssetBundleNames();获取所有的ab包的名字
-        //string []str= AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName("cube_prefab", "cube");
-        //foreach (string s in str) {
-        //    print(s);
-        //    AssetDatabase.LoadAssetAtPath<Object>(s).Create();
-        //}
-        print("解包");
-        allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();//获取所有的ab包的名字 ui cube sphere
+//#if UNITY_EDITOR
+//        //string []str= AssetDatabase.GetAssetPathsFromAssetBundle("cube");
+//        //string []str= AssetDatabase.GetAllAssetBundleNames();获取所有的ab包的名字
+//        //string []str= AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName("cube_prefab", "cube");
+//        //foreach (string s in str) {
+//        //    print(s);
+//        //    AssetDatabase.LoadAssetAtPath<Object>(s).Create();
+//        //}
+//        print("解包");
+//        allAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();//获取所有的ab包的名字 ui cube sphere
 
 
-        audioSource.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Prefabs/Sound/AudioTrainingSub1_1.mp3");
-        audioSource.Play();
-        if (!string.IsNullOrEmpty(FindAB("cube"))) {
-            AssetDatabase.LoadAssetAtPath<Object>(FindAB("cube")).Create();
-        }
+//        audioSource.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Prefabs/Sound/AudioTrainingSub1_1.mp3");
+//        audioSource.Play();
+//        if (!string.IsNullOrEmpty(FindAB("cube"))) {
+//            AssetDatabase.LoadAssetAtPath<Object>(FindAB("cube")).Create();
+//        }
        
-#endif
+//#endif
     }
     /// <summary>
     ///通过遍历ab包，给定资源名来获取资源路径
     /// </summary>
     /// <param name="assetName"></param>
     string FindAB(string assetName) {
-        if (allAssetBundleNames.Length != 0)
-        {
-            foreach (string s in allAssetBundleNames)
-            {
-                string[] s1 = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
-                if (s1.Length != 0)
-                {
-                    return s1[0];
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-        }
-        else {
-            return string.Empty;
-        }
+        //if (allAssetBundleNames.Length != 0)
+        //{
+        //    foreach (string s in allAssetBundleNames)
+        //    {
+        //        string[] s1 = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(s, assetName);
+        //        if (s1.Length != 0)
+        //        {
+        //            return s1[0];
+        //        }
+        //        else
+        //        {
+        //            return string.Empty;
+        //        }
+        //    }
+        //}
+        //else {
+        //    return string.Empty;
+        //}
         return string.Empty;
     }
     void TestFF() {

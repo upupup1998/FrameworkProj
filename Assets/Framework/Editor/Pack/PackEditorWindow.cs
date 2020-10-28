@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using Newtonsoft.Json;
+using System.Text;
+
 namespace Framework {
     public class PackEditorWindow : EditorWindow
     {
@@ -40,7 +43,31 @@ namespace Framework {
             PackSettings.ABPath = EditorGUILayout.TextField("Package Path", PackSettings.ABPath);
 
             if (GUILayout.Button("Package")) {
+                //打AB包
                 SignAssets.PackageAbs();
+                //生成config文件，AB文件索引
+                Asset asset = new Asset();
+                asset.dict = new Dictionary<string, string>();
+                string[] allABNames = AssetDatabase.GetAllAssetBundleNames();
+                foreach (string s in allABNames)
+                {
+                    string[] allAssetsPath = AssetDatabase.GetAssetPathsFromAssetBundle(s);
+
+                    foreach (string s2 in allAssetsPath)
+                    {
+                        
+                        string str1 = s2.Substring(s2.LastIndexOf("/") + 1, s2.LastIndexOf(".") - 1 - s2.LastIndexOf("/"));
+                        string str2 = PackSettings.ABPath + "/" + s;
+                        asset.dict.Add(str1, str2);
+                    }
+                }
+                string str = JsonConvert.SerializeObject(asset);
+                byte[] buffer = Encoding.UTF8.GetBytes(str);
+                FileStream fs = File.Create(Application.streamingAssetsPath + "/Config");
+                fs.Write(buffer, 0, buffer.Length);
+                fs.Flush();
+                fs.Dispose();
+                Debug.Log("Pack Success,Generate Config.");
             }
             if (GUILayout.Button("Clear All Package")) {
                 SignAssets.ClearAbs();

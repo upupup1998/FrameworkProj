@@ -28,7 +28,7 @@ public class SignAssets
     }
     public static void MarkAB(string path,bool isFolder=false)
     {
-        Debug.Log("MarkABPath="+path);
+        //Debug.Log("MarkABPath="+path);
         if (!string.IsNullOrEmpty(path))
         {
             if (isFolder)
@@ -46,11 +46,11 @@ public class SignAssets
             {
                 ai.assetBundleName = dir.Name.Replace(".", "_");
                 ai.assetBundleVariant = "";
-                Debug.Log("标记" + ai.assetBundleName + "成功");
+                Debug.Log("Sign" + ai.assetBundleName + "Success");
             }
             else
             {
-                Debug.Log("取消标记" + ai.assetBundleName);
+                Debug.Log("Cancel Sign" + ai.assetBundleName);
                 ai.assetBundleVariant = "";
                 ai.assetBundleName = "";
 
@@ -71,7 +71,7 @@ public class SignAssets
         AssetBundleManifest assetBundleManifest = BuildPipeline.BuildAssetBundles(directory, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
         if (assetBundleManifest != null)
         {
-            Debug.Log("AB打包完成!打包目录：" + directory);
+            Debug.Log("Pack Completed!Pack Directory：" + directory);
         }
         // DirectoryInfo代表文件夹的一个类 可实例化 ,Directory 静态类 不可实例化
         DirectoryInfo directoryInfo = new DirectoryInfo(directory);
@@ -81,7 +81,7 @@ public class SignAssets
             //清除manifest文件，打包目录
             if (file.Name.EndsWith("manifest")||directory.Contains(file.Name) )
             {
-                File.Delete(file.FullName);
+              File.Delete(file.FullName);
             }
         }
     }
@@ -95,6 +95,6 @@ public class SignAssets
         {
             File.Delete(files[i].FullName);
         }
-        Debug.Log("清除AB包完成!");
+        Debug.Log("Clear Completed!");
     }
 }
