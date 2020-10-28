@@ -36,7 +36,7 @@ namespace Framework {
         private void OnGUI()
         {
             list = new List<string>();
-            GUILayout.Label("PackKitage");
+            GUILayout.Label("PackKit");
             GUILayout.BeginVertical("BOX");
            
             PackSettings.SimulateAssetBundle= GUILayout.Toggle(PackSettings.SimulateAssetBundle, LocaleText.SimulationMode);
@@ -47,7 +47,9 @@ namespace Framework {
                 SignAssets.PackageAbs();
                 //生成config文件，AB文件索引
                 Asset asset = new Asset();
+              //  Debug.Log(asset.GetHashCode());
                 asset.dict = new Dictionary<string, string>();
+               // Debug.Log(asset.dict.Count);
                 string[] allABNames = AssetDatabase.GetAllAssetBundleNames();
                 foreach (string s in allABNames)
                 {
@@ -67,7 +69,10 @@ namespace Framework {
                 fs.Write(buffer, 0, buffer.Length);
                 fs.Flush();
                 fs.Dispose();
+             
+                asset.dict.Clear();
                 Debug.Log("Pack Success,Generate Config.");
+
             }
             if (GUILayout.Button("Clear All Package")) {
                 SignAssets.ClearAbs();
