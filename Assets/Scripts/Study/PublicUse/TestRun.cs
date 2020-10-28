@@ -9,10 +9,8 @@ using System.IO;
 
 using Newtonsoft.Json;
 using System.Text;
+using Object = UnityEngine.Object;
 
-public struct Asset {
-    public Dictionary<string, string> dict;
-}
 public class TestRun : MonoBehaviour
 {
     public AudioSource audioSource;
@@ -58,7 +56,12 @@ public class TestRun : MonoBehaviour
     /// 将ab中的资源文件的名字作为值，路径作为键。打包时写入到配置表中json格式。
     /// </summary>
     void TestJson() {
-      
+        //PackKit.Instance.AddPrefabLoader(new List<string>() { "fire","Cube"});
+        PackKit.Instance.Init(this);
+        //测试预加载资源功能
+        PackKit.Instance.AddPrefabLoader(new List<string>() { "Sphere", "Cube" });
+        PackKit.Instance.LoadAssetSync<Object>("Cube").Create();
+        img.sprite= PackKit.Instance.LoadAssetSync<Sprite>("fire");
     }
     void TestAssets() {
 //#if UNITY_EDITOR
