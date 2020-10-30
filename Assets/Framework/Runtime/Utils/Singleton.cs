@@ -21,9 +21,9 @@ namespace Framework {
         {
            
         }
-        private void Dispose()
+        protected virtual void Dispose()
         {
-            _Instance = null;
+            
         }
     }
     public abstract class MonoSingleton<T> : MonoBehaviour,ISingleton where T : MonoSingleton<T>,new()

@@ -5,21 +5,48 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 using System.IO;
-
+using System;
 
 using Newtonsoft.Json;
 using System.Text;
 using Object = UnityEngine.Object;
+using System.Net.Sockets;
+using System.Net;
+using System.Threading;
 
-public class TestRun : MonoBehaviour
+public class TestRun : MonoBehaviour,IDisposable
 {
     public AudioSource audioSource;
     string[] allAssetBundleNames;
     public Sprite sprite;
     public Image img;
+    private void OnDestroy()
+    {
+        ///PackKit.Instance.Destroy();
+
+    }
+    static Socket _socket = null;
     // Start is called before the first frame update
     void Start()
     {
+        //_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //_socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8082));
+        new Thread(()=> {
+            HttpWebRequest httpWeb = HttpWebRequest.Create("http://127.0.0.1:8081") as HttpWebRequest;
+            httpWeb.Method = "POST";
+            print("end");
+            HttpWebResponse wr = httpWeb.GetResponse() as HttpWebResponse;
+           
+            StreamReader streamReader = new StreamReader(wr.GetResponseStream(), false);
+            streamReader.ReadToEnd().ToString().Log();
+         
+        }).Start();
+     
+        //byte[] buffer = Encoding.UTF8.GetBytes("djaskjdklasjdlkjalsjdkalsjdkals");
+        //using (FileStream fs = File.Create(Application.persistentDataPath + "/Config")) {
+
+        //    fs.Write(buffer, 0, buffer.Length);
+        //}
         //ProductFactory.Create("mouse").Sell();
         //ProductFactory.Create("cup").Get();
         //Observer observer = new Observer();
@@ -28,8 +55,8 @@ public class TestRun : MonoBehaviour
         //observer.NoticeAll();
         //TestPackKit();
         // TestLoadAB();
-        TestLoadAB();
-        TestJson();
+        //TestLoadAB();
+        //TestJson();
     }
     void TestPackKit()
     {
@@ -57,10 +84,13 @@ public class TestRun : MonoBehaviour
     /// </summary>
     void TestJson() {
         //PackKit.Instance.AddPrefabLoader(new List<string>() { "fire","Cube"});
+        //初始化
         PackKit.Instance.Init(this);
         //测试预加载资源功能
         PackKit.Instance.AddPrefabLoader(new List<string>() { "Sphere", "Cube" });
+        //加载并实例化预制体
         PackKit.Instance.LoadAssetSync<Object>("Cube").Create();
+        //加载图片资源
         img.sprite= PackKit.Instance.LoadAssetSync<Sprite>("fire");
     }
     void TestAssets() {
@@ -124,6 +154,11 @@ public class TestRun : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void Dispose()
+    {
+        print("dispose ...");
     }
 }
 /*

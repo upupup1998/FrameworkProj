@@ -4,6 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Framework;
+namespace Framework { 
 public class SignAssets 
 {
     //标记ab包
@@ -97,4 +98,5 @@ public class SignAssets
         }
         Debug.Log("Clear Completed!");
     }
+}
 }

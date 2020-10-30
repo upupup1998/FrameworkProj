@@ -22,6 +22,20 @@ namespace Framework {
         private MonoBehaviour _mono=null;
         private Asset asset;
         /// <summary>
+        /// 销毁实例
+        /// </summary>
+        public void Destroy() {
+           
+            prefabDict.Clear();
+            _mono = null;
+            Dispose();
+        }
+        protected override void Dispose()
+        {
+            base.Dispose();
+            _Instance = null;
+        }
+        /// <summary>
         /// 初始化PackKit
         /// </summary>
         public void Init(MonoBehaviour mono) {
@@ -339,27 +353,27 @@ namespace Framework {
     }
 }
 /*
- AssetDatabase类：对资源进行读取的类
- 不能被实例化，可用来读取asset，只能在editor下使用
-     方法：
-     GetAllAssetBundleNames() 获取所有的ab包的名字
-     GetAssetPathsFromAssetBundle(string abName) 获取ab包中的所有资源路径
-     GetAssetPathsFromAssetBundleAndAssetName(string abName,string assetName)给定ab包名，资源名字，获取到资源的路径
-     LoadAssetAtPath<T>(string assetPath)指定要加载的资源类型T,给定资源的路径，加载资源
-     GetAssetBundleDependencies()获取资源引用（暂无使用）
+     AssetDatabase类：对资源进行读取的类
+     不能被实例化，可用来读取asset，只能在editor下使用
+         方法：
+         GetAllAssetBundleNames() 获取所有的ab包的名字
+         GetAssetPathsFromAssetBundle(string abName) 获取ab包中的所有资源路径
+         GetAssetPathsFromAssetBundleAndAssetName(string abName,string assetName)给定ab包名，资源名字，获取到资源的路径
+         LoadAssetAtPath<T>(string assetPath)指定要加载的资源类型T,给定资源的路径，加载资源
+         GetAssetBundleDependencies()获取资源引用（暂无使用）
 
-直接从ab中加载资源：
-    打包生成Config文件：
-    JSON格式如下：
-       // key = "Cube" , "value = "Assets/StreamingAssets/prefabs （Dict存放格式）
-       //"fire":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/art" （Dict存放格式 : 文件名 + 文件路径）
-    加载方式：
-        根据文件名去遍历config，得到存放路径，再根据路径去加载对应的资源。
-        预制体加载：可以先预加载预制体，然后从容器中取出，直接使用预制体
-        Compeleted，Problem：预加载给一个非预制体的值，也会进行加载（待解决）
-Simulate mode 加载策略：
-    1.加载Prefabs类型的资源
-    游戏开始时预先加载好，存放在字典中，需要使用的时候再从字典中取出使用。Compeleted
-    2.加载非Prefabs类型的资源 如：音乐，图片，shader，脚本
-    直接使用PackKit.LoadAssetSync方法进行加载。Compeleted                            
+    1. 直接从ab中加载资源：
+        打包生成Config文件：
+        JSON格式如下：
+           // key = "Cube" , "value = "Assets/StreamingAssets/prefabs （Dict存放格式）
+           //"fire":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/art" （Dict存放格式 : 文件名 + 文件路径）
+        加载方式：
+            根据文件名去遍历config，得到存放路径，再根据路径去加载对应的资源。
+            预制体加载：可以先预加载预制体，然后从容器中取出，直接使用预制体
+            Compeleted，Problem：预加载给一个非预制体的值，也会进行加载（待解决）
+    2. Simulate mode 加载策略：
+        1.加载Prefabs类型的资源
+        游戏开始时预先加载好，存放在字典中，需要使用的时候再从字典中取出使用。Compeleted
+        2.加载非Prefabs类型的资源 如：音乐，图片，shader，脚本
+        直接使用PackKit.LoadAssetSync方法进行加载。Compeleted                            
      */
