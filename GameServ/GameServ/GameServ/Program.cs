@@ -69,11 +69,15 @@ namespace GameServ
                 byte[] recv_buffer = new byte[1024 * 640];
                 int real_recv = new_client.Receive(recv_buffer);  //接收浏览器的请求数据
                 string recv_request = Encoding.UTF8.GetString(recv_buffer, 0, real_recv);
-                Console.WriteLine(recv_request);  //将请求显示到界面
-
-                Resolve(recv_request, new_client);  //解析、路由、处理
+                //Console.WriteLine("*********************");
+                //Console.WriteLine(recv_request);  //将请求显示到界面
+                //Console.WriteLine("*********************");
+                // Resolve(recv_request, new_client);  //解析、路由、处理
 
                 //NO.2  串行处理http请求
+                Console.WriteLine("有人请求了页面...");
+                //发送一个文件
+                SendFile(new_client);
             }
             catch
             {
@@ -114,8 +118,30 @@ namespace GameServ
                         }
                     }
                 }
-                Route(items[1], param, response);  //路由处理
+                //路由处理 返回一个html
+                 Route(items[1], param, response);
+               
             }
+        }
+
+        static void SendFile(Socket new_client) {
+            StringBuilder buf = new StringBuilder();
+
+            Console.WriteLine("开始发送...");
+            string statusline = "HTTP/1.1 200 OK\r\n";
+           // new_client.Send(Encoding.UTF8.GetBytes(statusline));
+
+            string path = "C:/Users/Administrator/Desktop/kkk.txt";
+            byte [] buffer = File.ReadAllBytes(path);
+            string header = string.Format("Content-Type:application/json;charset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
+            //  new_client.Send(Encoding.UTF8.GetBytes(header));
+            buf.Append(statusline).Append(header).Append("\r\n").Append(Encoding.UTF8.GetString(buffer));
+            
+            byte[] ms = System.Text.UTF8Encoding.UTF8.GetBytes(buf.ToString());
+            new_client.Send(ms);
+            new_client.Close();
+
+            Console.WriteLine("发送成功..."+ buf.ToString());
         }
 
         /// <summary>
@@ -126,9 +152,9 @@ namespace GameServ
         /// <param name="response"></param>
         static void Route(string path, Dictionary<string, string> param, Socket response)
         {
-            Console.WriteLine("************************************************");
-            Console.WriteLine(path);
-            Console.WriteLine("************************************************");
+            //Console.WriteLine("************************************************");
+            //Console.WriteLine(path);
+            //Console.WriteLine("************************************************");
             if (path.EndsWith("index.html") || path.EndsWith("/"))  //请求首页
             {
                 Home.HomePage(response);
@@ -172,7 +198,6 @@ namespace GameServ
 
             string header = string.Format("Content-Type:text/html;charset=UTF-8\r\nContent-Length:{0}\r\n", content_to_bytes.Length);
             byte[] header_to_bytes = Encoding.UTF8.GetBytes(header);  //应答头
-
             response.Send(statusline_to_bytes);  //发送状态行
             response.Send(header_to_bytes);  //发送应答头
             response.Send(new byte[] { (byte)'\r', (byte)'\n' });  //发送空行
@@ -225,7 +250,7 @@ namespace GameServ
     }
     #endregion
 }
-
+#region 响应报文示例
 // GET / HTTP/1.1
 //Host: 127.0.0.1:8081
 //Connection: keep-alive
@@ -284,4 +309,34 @@ namespace GameServ
 //Referer: http://127.0.0.1:8081/login.zsp
 //Accept-Encoding: gzip, deflate, br
 //Accept-Language: zh,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh-CN;q=0.6
+#endregion
 
+//===================================================http响应报文==============================================================
+//HTTP/1.1 200 OK
+
+//Content-Type:text/html;charset=UTF-8
+//Content-Length:310
+
+
+
+//<html><head><title>socket webServer  -- Login</title></head><body><div style = "text-align:center" >
+//    < form method="post" action="/login.zsp">用户名:&nbsp;<input name = "id" />< br /> 密码:&nbsp;&nbsp;
+//    &nbsp;<input name = "pass" type="password"/><br /><input type = "submit" value="登录"/></form>
+//    </div></body></html>
+//===================================================http响应报文==============================================================
+
+
+//===================================================正确的http响应报文(发送json)==============================================================
+//发送成功...
+//HTTP/1.1 200 OK
+//Content-Type:application/json;charset=UTF-8
+//Content-Length:745
+//
+//{"dict":{"fire":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/art","Directional Light":"F:/Ackerman/FrameworkProj/Assets/Strea
+//    mingAssets/directional light_prefab","Button":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/prefabs","Cube":"F:/Ackerman/Fra
+//    meworkProj/Assets/StreamingAssets/prefabs","GameObject":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/prefabs","Sphere":"F:/A
+//    ckerman/FrameworkProj/Assets/StreamingAssets/prefabs","Text":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/prefabs","AudioTrain
+//    ingSub1_1":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/sound","AudioTrainingSub1_2":"F:/Ackerman/FrameworkProj/Assets/Streaming
+//    Assets/sound","AudioTrainingSub1_3":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/sound"}}
+
+//===================================================正确的http响应报文(发送json)==============================================================
