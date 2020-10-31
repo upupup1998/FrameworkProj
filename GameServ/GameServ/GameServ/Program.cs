@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using LitJson;
 namespace GameServ
 {
     class Program
@@ -123,19 +123,31 @@ namespace GameServ
                
             }
         }
-
+        //application/octet-stream
         static void SendFile(Socket new_client) {
             StringBuilder buf = new StringBuilder();
 
             Console.WriteLine("开始发送...");
             string statusline = "HTTP/1.1 200 OK\r\n";
-           // new_client.Send(Encoding.UTF8.GetBytes(statusline));
+            // new_client.Send(Encoding.UTF8.GetBytes(statusline));
 
-            string path = "C:/Users/Administrator/Desktop/kkk.txt";
-            byte [] buffer = File.ReadAllBytes(path);
-            string header = string.Format("Content-Type:application/json;charset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
+            //string path = "C:/Users/Administrator/Desktop/kkk.txt";
+              // string path = "C:/Users/Administrator/Desktop/socket_webServer.rar";
+            string path = "C:/Users/Administrator/Desktop/per.png";
+           // byte [] buffer = File.ReadAllBytes(path);
+            byte [] buffer = SaveImage(path);
+            //测试下载文档 Compeleted
+            // string header = string.Format("Content-Disposition:attachment;filename=ByteBuffer.cs\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
+
+            //测试下载压缩包
+            // string header = string.Format("Content-Disposition:attachment;filename=socket_webServer.rar\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
+            //测试传输img
+       
+            string base64str = Convert.ToBase64String(buffer);
+            string json = JsonMapper.ToJson(base64str);
             //  new_client.Send(Encoding.UTF8.GetBytes(header));
-            buf.Append(statusline).Append(header).Append("\r\n").Append(Encoding.UTF8.GetString(buffer));
+            string header = string.Format("Content-Type:application/json;charset=UTF-8\r\nContent-Length:{0}\r\n", Encoding.UTF8.GetBytes(json).Length);
+            buf.Append(statusline).Append(header).Append("\r\n").Append(json);
             
             byte[] ms = System.Text.UTF8Encoding.UTF8.GetBytes(buf.ToString());
             new_client.Send(ms);
@@ -143,6 +155,15 @@ namespace GameServ
 
             Console.WriteLine("发送成功..."+ buf.ToString());
         }
+
+        public static byte[] SaveImage(String path)
+        {
+            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read); //将图片以文件流的形式进行保存
+            BinaryReader br = new BinaryReader(fs);
+            byte[] imgBytesIn = br.ReadBytes((int)fs.Length); //将流读入到字节数组中
+            return imgBytesIn;
+        }
+
 
         /// <summary>
         /// 按照请求路径（不包括主机部分）  进行路由处理
