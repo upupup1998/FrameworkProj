@@ -13,6 +13,7 @@ using Object = UnityEngine.Object;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using UnityEngine.Networking;
 
 public class TestRun : MonoBehaviour,IDisposable
 {
@@ -23,25 +24,44 @@ public class TestRun : MonoBehaviour,IDisposable
     private void OnDestroy()
     {
         ///PackKit.Instance.Destroy();
-
+        //_socket.Close();
+        //_socket.Dispose();
+        //_socket = null;
     }
+   
     static Socket _socket = null;
+    byte[] bf=new byte[1024*1024];
     // Start is called before the first frame update
     void Start()
     {
+        // _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);  //侦听socket
+        //if (_socket.BeginConnect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8081), null, _socket).AsyncWaitHandle.WaitOne(10000)) { 
+        //     print("connect success"+ _socket.Connected);
+        //    if (_socket.Connected)
+        //    {
+        //        print("connect success");
+        //        _socket.BeginReceive(bf, 0, 1, SocketFlags.None, callback, _socket);
+        //    }
+        //}
         //_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         //_socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8082));
-        new Thread(()=> {
+        new Thread(() =>
+        {
             HttpWebRequest httpWeb = HttpWebRequest.Create("http://127.0.0.1:8081") as HttpWebRequest;
             httpWeb.Method = "POST";
             print("end");
             HttpWebResponse wr = httpWeb.GetResponse() as HttpWebResponse;
-           
-            StreamReader streamReader = new StreamReader(wr.GetResponseStream(), false);
-            streamReader.ReadToEnd().ToString().Log();
          
+            StreamReader streamReader = new StreamReader(wr.GetResponseStream(), false);
+            string base64str= streamReader.ReadToEnd();
+           
+            FileStream fs = new FileStream("C:/Users/Administrator/Desktop/JDKSJADKLA.png", FileMode.CreateNew);
+            fs.Write(Convert.FromBase64String(base64str), 0, Convert.FromBase64String(base64str).Length);
+            fs.Flush();
+            fs.Close();
+            fs.Dispose();
         }).Start();
-     
+
         //byte[] buffer = Encoding.UTF8.GetBytes("djaskjdklasjdlkjalsjdkalsjdkals");
         //using (FileStream fs = File.Create(Application.persistentDataPath + "/Config")) {
 
@@ -57,6 +77,33 @@ public class TestRun : MonoBehaviour,IDisposable
         // TestLoadAB();
         //TestLoadAB();
         //TestJson();
+        //StartCoroutine("Get");
+    }
+
+    private void callback(IAsyncResult ar)
+    {
+        print("connect...");
+        _socket = ar.AsyncState as Socket;
+        print("connect...2");
+        int cc = _socket.EndReceive(ar);
+        print("connect...3");
+        Debug.Log("boo="+cc==null);
+        print("cc="+cc);
+        _socket.BeginReceive(bf, 0, bf.Length, SocketFlags.None, callback, _socket);
+        print("connect...4");
+    }
+
+    IEnumerator Get() {
+        UnityWebRequest webRequest =UnityWebRequest.Get("http://127.0.0.1:8081");
+        yield return webRequest.downloadHandler;
+        if (webRequest.error != null)
+        {
+
+        }
+        else {
+            byte[] buffer = webRequest.downloadHandler.data;
+            Debug.Log(Encoding.UTF8.GetString(buffer));
+        }
     }
     void TestPackKit()
     {
@@ -158,6 +205,7 @@ public class TestRun : MonoBehaviour,IDisposable
 
     public void Dispose()
     {
+      
         print("dispose ...");
     }
 }

@@ -51,6 +51,7 @@ namespace GameServ
         static Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);  //侦听socket
         static void Main(string[] args)
         {
+            Console.WriteLine("http start...");
             _socket.Bind(new IPEndPoint(IPAddress.Any, 8081));
             _socket.Listen(100);
             _socket.BeginAccept(new AsyncCallback(OnAccept), _socket);  //开始接收来自浏览器的http请求（其实是socket连接请求）
@@ -129,31 +130,69 @@ namespace GameServ
 
             Console.WriteLine("开始发送...");
             string statusline = "HTTP/1.1 200 OK\r\n";
+           // string statusline = "POST   " + "http://127.0.0.1:8081" + " HTTP/1.1 \r\n";
             // new_client.Send(Encoding.UTF8.GetBytes(statusline));
 
             //string path = "C:/Users/Administrator/Desktop/kkk.txt";
-              // string path = "C:/Users/Administrator/Desktop/socket_webServer.rar";
-            string path = "C:/Users/Administrator/Desktop/per.png";
+            // string path = "C:/Users/Administrator/Desktop/socket_webServer.rar";
+            string path = "C:/Users/Administrator/Desktop/1111.jpg";
            // byte [] buffer = File.ReadAllBytes(path);
             byte [] buffer = SaveImage(path);
+
             //测试下载文档 Compeleted
             // string header = string.Format("Content-Disposition:attachment;filename=ByteBuffer.cs\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
 
             //测试下载压缩包
             // string header = string.Format("Content-Disposition:attachment;filename=socket_webServer.rar\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
-            //测试传输img
-       
+           
+            //测试传输PNG 只能传输base64字符串（下载功能待完善）
+            //string header = string.Format("Content-Type:image/png;charset=UTF-8\r\nContent-Length:{0}\r\n", Encoding.UTF8.GetBytes(base64str).Length);
+
+
             string base64str = Convert.ToBase64String(buffer);
-            string json = JsonMapper.ToJson(base64str);
+
+            //============================================将base64字符串转化为图片============================================string64
+            //byte[] img = Convert.FromBase64String(File.ReadAllText("C:/Users/Administrator/Desktop/string64.txt"));
+            //FileStream fs = new FileStream("C:/Users/Administrator/Desktop/wwww.png", FileMode.CreateNew);
+            //fs.Write(img, 0, img.Length);
+            //fs.Flush();
+            //fs.Close();
+            //fs.Dispose();
+            //FileStream fs2 = new FileStream("C:/Users/Administrator/Desktop/createImg2.txt", FileMode.CreateNew);
+            //fs2.Write(Encoding.UTF8.GetBytes(base64str), 0, Encoding.UTF8.GetBytes(base64str).Length);
+            //fs2.Flush();
+            //fs2.Close();
+            //fs2.Dispose();
+            //============================================将base64字符串转化为图片============================================
+
+
+
+
+
+            Console.WriteLine("********************************************************");
+            //string json = JsonMapper.ToJson(base64str);
+            //Content-Disposition:attachment inline ISO-8859-1
+            //  Console.WriteLine(base64str);
             //  new_client.Send(Encoding.UTF8.GetBytes(header));
-            string header = string.Format("Content-Type:application/json;charset=UTF-8\r\nContent-Length:{0}\r\n", Encoding.UTF8.GetBytes(json).Length);
-            buf.Append(statusline).Append(header).Append("\r\n").Append(json);
-            
-            byte[] ms = System.Text.UTF8Encoding.UTF8.GetBytes(buf.ToString());
+            //string header = string.Format("Content-Type:image/jpg;charset=UTF-8\r\nContent-Length:{0}\r\n", Encoding.UTF8.GetBytes(base64str).Length);
+            string header = string.Format("Content-Type:image/jpeg;filename=my.jpg\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", Encoding.UTF8.GetBytes(base64str).Length);
+            buf.Append(statusline).Append(header).Append("\r\n").Append(base64str);
+
+
+            Console.WriteLine(buf.ToString());
+            byte[] ms = Encoding.UTF8.GetBytes(buf.ToString());
             new_client.Send(ms);
             new_client.Close();
 
             Console.WriteLine("发送成功..."+ buf.ToString());
+        }
+
+        public static string ImgToBase64(string path) {
+            if (!string.IsNullOrEmpty(path)) {
+                MemoryStream ms = new MemoryStream();
+                
+            }
+            return null;
         }
 
         public static byte[] SaveImage(String path)
