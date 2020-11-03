@@ -51,6 +51,12 @@ namespace GameServ
         static Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);  //侦听socket
         static void Main(string[] args)
         {
+           // Console.WriteLine("http start...");
+            GameServ.Server.SocServer hs = new Server.SocServer("127.0.0.1",8081);
+            hs.StartAccept();
+            Console.ReadKey();
+        }
+        static void StartSoc() {
             Console.WriteLine("http start...");
             _socket.Bind(new IPEndPoint(IPAddress.Any, 8081));
             _socket.Listen(100);
@@ -70,8 +76,11 @@ namespace GameServ
                 byte[] recv_buffer = new byte[1024 * 640];
                 int real_recv = new_client.Receive(recv_buffer);  //接收浏览器的请求数据
                 string recv_request = Encoding.UTF8.GetString(recv_buffer, 0, real_recv);
+                int i = recv_request.IndexOf("HTTP");
+              
                 //Console.WriteLine("*********************");
-                //Console.WriteLine(recv_request);  //将请求显示到界面
+                Console.WriteLine(recv_request);  //将请求显示到界面
+                Console.WriteLine("i="+i);  //将请求显示到界面
                 //Console.WriteLine("*********************");
                 // Resolve(recv_request, new_client);  //解析、路由、处理
 
@@ -139,7 +148,7 @@ namespace GameServ
            // byte [] buffer = File.ReadAllBytes(path);
             byte [] buffer = SaveImage(path);
 
-            //测试下载文档 Compeleted
+            //测试下载文档Compeleted
             // string header = string.Format("Content-Disposition:attachment;filename=ByteBuffer.cs\r\ncharset=UTF-8\r\nContent-Length:{0}\r\n", buffer.Length);
 
             //测试下载压缩包
@@ -150,7 +159,7 @@ namespace GameServ
 
 
             string base64str = Convert.ToBase64String(buffer);
-
+            #region 将base64字符串转化为图片
             //============================================将base64字符串转化为图片============================================string64
             //byte[] img = Convert.FromBase64String(File.ReadAllText("C:/Users/Administrator/Desktop/string64.txt"));
             //FileStream fs = new FileStream("C:/Users/Administrator/Desktop/wwww.png", FileMode.CreateNew);
@@ -164,7 +173,7 @@ namespace GameServ
             //fs2.Close();
             //fs2.Dispose();
             //============================================将base64字符串转化为图片============================================
-
+            #endregion
 
 
 
@@ -179,12 +188,12 @@ namespace GameServ
             buf.Append(statusline).Append(header).Append("\r\n").Append(base64str);
 
 
-            Console.WriteLine(buf.ToString());
+           // Console.WriteLine(buf.ToString());
             byte[] ms = Encoding.UTF8.GetBytes(buf.ToString());
             new_client.Send(ms);
             new_client.Close();
 
-            Console.WriteLine("发送成功..."+ buf.ToString());
+            //Console.WriteLine("发送成功..."+ buf.ToString());
         }
 
         public static string ImgToBase64(string path) {
@@ -400,3 +409,19 @@ namespace GameServ
 //    Assets/sound","AudioTrainingSub1_3":"F:/Ackerman/FrameworkProj/Assets/StreamingAssets/sound"}}
 
 //===================================================正确的http响应报文(发送json)==============================================================
+
+
+#region 浏览器发送请求 url="http://http://127.0.0.1:8081/ackerman/1.jpg"
+//GET /ackerman/1.jpg HTTP/1.1
+//Host: 127.0.0.1:8081
+//Connection: keep-alive
+//Upgrade-Insecure-Requests: 1
+//User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36
+//Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+//Sec-Fetch-Site: none
+//Sec-Fetch-Mode: navigate
+//Sec-Fetch-User: ?1
+//Sec-Fetch-Dest: document
+//Accept-Encoding: gzip, deflate, br
+//Accept-Language: zh,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh-CN;q=0.6
+#endregion

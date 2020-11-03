@@ -51,6 +51,8 @@
     <Compile Include="Runtime\HttpProcecssor.cs" />
     <Compile Include="Runtime\HttpServer.cs" />
     <Compile Include="Runtime\MyHttpServer.cs" />
+    <Compile Include="Server\HttpServer.cs" />
+    <Compile Include="Server\SocServer.cs" />
     <Compile Include="Utils\EventDispatch.cs" />
   </ItemGroup>
   <ItemGroup>

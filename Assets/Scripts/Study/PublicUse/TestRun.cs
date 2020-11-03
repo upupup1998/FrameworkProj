@@ -24,9 +24,9 @@ public class TestRun : MonoBehaviour,IDisposable
     private void OnDestroy()
     {
         ///PackKit.Instance.Destroy();
-        //_socket.Close();
-        //_socket.Dispose();
-        //_socket = null;
+        _socket.Close();
+        _socket.Dispose();
+        _socket = null;
     }
    
     static Socket _socket = null;
@@ -34,33 +34,33 @@ public class TestRun : MonoBehaviour,IDisposable
     // Start is called before the first frame update
     void Start()
     {
-        // _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);  //侦听socket
-        //if (_socket.BeginConnect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8081), null, _socket).AsyncWaitHandle.WaitOne(10000)) { 
-        //     print("connect success"+ _socket.Connected);
-        //    if (_socket.Connected)
-        //    {
-        //        print("connect success");
-        //        _socket.BeginReceive(bf, 0, 1, SocketFlags.None, callback, _socket);
-        //    }
-        //}
-        //_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        //_socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8082));
-        new Thread(() =>
-        {
-            HttpWebRequest httpWeb = HttpWebRequest.Create("http://127.0.0.1:8081") as HttpWebRequest;
-            httpWeb.Method = "POST";
-            print("end");
-            HttpWebResponse wr = httpWeb.GetResponse() as HttpWebResponse;
-         
-            StreamReader streamReader = new StreamReader(wr.GetResponseStream(), false);
-            string base64str= streamReader.ReadToEnd();
-           
-            FileStream fs = new FileStream("C:/Users/Administrator/Desktop/JDKSJADKLA.png", FileMode.CreateNew);
-            fs.Write(Convert.FromBase64String(base64str), 0, Convert.FromBase64String(base64str).Length);
-            fs.Flush();
-            fs.Close();
-            fs.Dispose();
+        new Thread(()=> {
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8081));
+       
+            _socket.BeginReceive(bf, 0, bf.Length, SocketFlags.None, callback, null);
         }).Start();
+ 
+       
+        //_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //_socket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8081));
+
+        //new Thread(() =>
+        //{
+        //    HttpWebRequest httpWeb = HttpWebRequest.Create("http://127.0.0.1:8081") as HttpWebRequest;
+        //    httpWeb.Method = "POST";
+        //    print("end");
+        //    HttpWebResponse wr = httpWeb.GetResponse() as HttpWebResponse;
+
+        //    StreamReader streamReader = new StreamReader(wr.GetResponseStream(), false);
+        //    string base64str= streamReader.ReadToEnd();
+
+        //    FileStream fs = new FileStream("C:/Users/Administrator/Desktop/JDKSJADKLA.png", FileMode.CreateNew);
+        //    fs.Write(Convert.FromBase64String(base64str), 0, Convert.FromBase64String(base64str).Length);
+        //    fs.Flush();
+        //    fs.Close();
+        //    fs.Dispose();
+        //}).Start();
 
         //byte[] buffer = Encoding.UTF8.GetBytes("djaskjdklasjdlkjalsjdkalsjdkals");
         //using (FileStream fs = File.Create(Application.persistentDataPath + "/Config")) {
@@ -79,18 +79,39 @@ public class TestRun : MonoBehaviour,IDisposable
         //TestJson();
         //StartCoroutine("Get");
     }
+    public void SendMessage() {
+        int i = 0;
+        //字节长度+字节数组
 
+        string str = "Hello" + i;
+        byte [] bufferLen = Encoding.UTF8.GetBytes((Encoding.UTF8.GetBytes(str).Length).ToString());
+        byte[] buffer = Encoding.UTF8.GetBytes(str);
+        byte[] newBuff = new byte[buffer.Length+bufferLen.Length];
+        // Array arr = new Array();
+        //Array.Copy(bufferLen,newBuff,0, bufferLen.Length);
+
+    }
     private void callback(IAsyncResult ar)
     {
-        print("connect...");
-        _socket = ar.AsyncState as Socket;
-        print("connect...2");
+      
+        //_socket = ar.AsyncState as Socket;
+   
         int cc = _socket.EndReceive(ar);
-        print("connect...3");
-        Debug.Log("boo="+cc==null);
-        print("cc="+cc);
-        _socket.BeginReceive(bf, 0, bf.Length, SocketFlags.None, callback, _socket);
-        print("connect...4");
+        if (cc == 0)
+        {
+            
+            _socket.Close();
+        }
+        else {
+           
+            _socket.Send(Encoding.UTF8.GetBytes("connect ..."));
+            print(Encoding.UTF8.GetString(bf,0,cc));
+        
+            _socket.BeginReceive(bf, 0, bf.Length, SocketFlags.None, callback, _socket);
+            _socket.Close();
+ 
+        }
+     
     }
 
     IEnumerator Get() {
