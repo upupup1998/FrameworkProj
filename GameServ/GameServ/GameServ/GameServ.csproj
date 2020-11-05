@@ -46,13 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logic\ClientLogic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\HttpProcecssor.cs" />
     <Compile Include="Runtime\HttpServer.cs" />
     <Compile Include="Runtime\MyHttpServer.cs" />
     <Compile Include="Server\HttpServer.cs" />
+    <Compile Include="Server\Room.cs" />
     <Compile Include="Server\SocServer.cs" />
+    <Compile Include="Utils\Bufferbyte.cs" />
     <Compile Include="Utils\EventDispatch.cs" />
   </ItemGroup>
   <ItemGroup>

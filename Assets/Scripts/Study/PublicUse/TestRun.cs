@@ -84,26 +84,36 @@ public class TestRun : MonoBehaviour,IDisposable
     //public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length);
     //[ReliabilityContract(Consistency.MayCorruptInstance, Cer.MayFail)]
     //public static void Copy(Array sourceArray, long sourceIndex, Array destinationArray, long destinationIndex, long length);
+    /// <summary>
+    /// 发送消息实例
+    /// </summary>
     public void SendMessage() {
-        int i = 0;
+      //  int i = 0;
         //字节长度+字节数组
-        while (i<=100) {
+        //while (i<=100) {
 
       
-        string str = "Hello" + i;
+      //  string str = "Hello" + i;
+        string str = "Login";
+            Bufferbyte bufferbyte = new Bufferbyte();
+            bufferbyte.WriteString(str);
+            bufferbyte.WriteInt(123456);
+            bufferbyte.WriteString("zrm123");
+            bufferbyte.SendMessage(_socket);
         // byte [] bufferLen = Encoding.UTF8.GetBytes((Encoding.UTF8.GetBytes(str).Length).ToString());
        // print(Encoding.UTF8.GetBytes(str).Length);
-        byte [] bufferLen = BitConverter.GetBytes(Encoding.UTF8.GetBytes(str).Length);
+       //==================普通发送方式
+        //byte [] bufferLen = BitConverter.GetBytes(Encoding.UTF8.GetBytes(str).Length);
         
-        byte[] buffer = Encoding.UTF8.GetBytes(str);
-        byte[] newBuff = new byte[buffer.Length+bufferLen.Length];
-        Array.Copy(bufferLen,0,newBuff,0,bufferLen.Length);
-        Array.Copy(buffer,0, newBuff, bufferLen.Length, buffer.Length);
-            print("发送消息" + str + "成功");
-            _socket.Send(newBuff);
-
-            i++;
-        }
+        //byte[] buffer = Encoding.UTF8.GetBytes(str);
+        //byte[] newBuff = new byte[buffer.Length+bufferLen.Length];
+        //Array.Copy(bufferLen,0,newBuff,0,bufferLen.Length);
+        //Array.Copy(buffer,0, newBuff, bufferLen.Length, buffer.Length);
+        //    print("发送消息" + str + "成功");
+        //    _socket.Send(newBuff);
+        //=================
+          //  i++;
+     //   }
         // Array arr = new Array();
         //Array.Copy(bufferLen,newBuff,0, bufferLen.Length);
 

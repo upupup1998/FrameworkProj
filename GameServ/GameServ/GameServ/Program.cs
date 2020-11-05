@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
+using GameServ.Utils;
 namespace GameServ
 {
     class Program
@@ -51,13 +52,18 @@ namespace GameServ
         static Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);  //侦听socket
         static void Main(string[] args)
         {
+            RegisterVoid();//注册一些方法
            // Console.WriteLine("http start...");
             GameServ.Server.SocServer hs = new Server.SocServer("127.0.0.1",8081);
             hs.StartAccept();
             Console.ReadKey();
         }
+        static void RegisterVoid() {
+            EventDispatch.AddEventListener("GameServ.Logic.ClientLogic","Login");
+          
+        }
         static void StartSoc() {
-            Console.WriteLine("http start...");
+            Console.WriteLine("Http start...");
             _socket.Bind(new IPEndPoint(IPAddress.Any, 8081));
             _socket.Listen(100);
             _socket.BeginAccept(new AsyncCallback(OnAccept), _socket);  //开始接收来自浏览器的http请求（其实是socket连接请求）
