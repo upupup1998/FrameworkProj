@@ -68,7 +68,18 @@ namespace GameServ.Server
                 Close();
             }
             else {
-                Console.WriteLine(name + " say :" + Encoding.UTF8.GetString(buff,0,count));
+
+
+
+
+                byte[] lenBuffer = new byte[4];
+                Array.Copy(buff, 0, lenBuffer, 0, 4);
+                int len = BitConverter.ToInt32(lenBuffer, 0);
+                //string len = Encoding.UTF8.GetString(buff, 0, 4);
+              //  Console.WriteLine("len=" + len);
+                //string msg = Encoding.UTF8.GetString(buff, 4, len);
+                string msg = Encoding.UTF8.GetString(buff,4, len);
+                Console.WriteLine(name + " say :" + msg);
                 clientSoc.BeginReceive(buff, 0, buff.Length, SocketFlags.None, ReceiveCallBack, clientSoc);
             }
         }

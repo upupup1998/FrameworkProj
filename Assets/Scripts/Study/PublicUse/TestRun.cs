@@ -79,14 +79,31 @@ public class TestRun : MonoBehaviour,IDisposable
         //TestJson();
         //StartCoroutine("Get");
     }
+    //  [ReliabilityContract(Consistency.MayCorruptInstance, Cer.MayFail)]
+    //[SecuritySafeCritical]
+    //public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length);
+    //[ReliabilityContract(Consistency.MayCorruptInstance, Cer.MayFail)]
+    //public static void Copy(Array sourceArray, long sourceIndex, Array destinationArray, long destinationIndex, long length);
     public void SendMessage() {
         int i = 0;
         //字节长度+字节数组
+        while (i<=100) {
 
+      
         string str = "Hello" + i;
-        byte [] bufferLen = Encoding.UTF8.GetBytes((Encoding.UTF8.GetBytes(str).Length).ToString());
+        // byte [] bufferLen = Encoding.UTF8.GetBytes((Encoding.UTF8.GetBytes(str).Length).ToString());
+       // print(Encoding.UTF8.GetBytes(str).Length);
+        byte [] bufferLen = BitConverter.GetBytes(Encoding.UTF8.GetBytes(str).Length);
+        
         byte[] buffer = Encoding.UTF8.GetBytes(str);
         byte[] newBuff = new byte[buffer.Length+bufferLen.Length];
+        Array.Copy(bufferLen,0,newBuff,0,bufferLen.Length);
+        Array.Copy(buffer,0, newBuff, bufferLen.Length, buffer.Length);
+            print("发送消息" + str + "成功");
+            _socket.Send(newBuff);
+
+            i++;
+        }
         // Array arr = new Array();
         //Array.Copy(bufferLen,newBuff,0, bufferLen.Length);
 
@@ -99,7 +116,7 @@ public class TestRun : MonoBehaviour,IDisposable
         int cc = _socket.EndReceive(ar);
         if (cc == 0)
         {
-            
+            print("server is diconnect...");
             _socket.Close();
         }
         else {
