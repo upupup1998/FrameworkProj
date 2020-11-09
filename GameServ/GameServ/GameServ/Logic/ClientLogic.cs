@@ -13,9 +13,19 @@ namespace GameServ.Logic
         /// </summary>
         /// <param name="bufferbyte"></param>
         public void Login (Bufferbyte bufferbyte) {
-            int count = bufferbyte.ReadInt();
-            string password =  bufferbyte.ReadString();
-            Console.WriteLine("Login count ="+ count+",password="+password);
+            try
+            {
+                int count = bufferbyte.ReadInt();
+                string password = bufferbyte.ReadString();
+                Console.WriteLine("Login count =" + count + ",password=" + password);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : " + e);
+            }
+            finally {
+                bufferbyte.Clear();
+            }
         }
         /// <summary>
         /// Register Method
